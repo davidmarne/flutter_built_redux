@@ -1,0 +1,20 @@
+.atom/
+.idea/
+
+# dart
+.packages
+.pub
+packages
+pubspec.lock
+
+# flutter
+build/
+
+# docs
+dartdoc-viewer/
+
+# coverage
+/coverage/
+
+example/chat_app/ios
+example/chat_app/android
