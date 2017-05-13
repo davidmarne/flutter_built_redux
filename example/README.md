@@ -1,4 +1,4 @@
-flutter_flux Example
+flutter_built_redux Example
 ====================
 
 To run the example, follow the instructions at [flutter.io](https://flutter.io)
