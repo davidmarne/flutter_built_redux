@@ -11,7 +11,7 @@ from the flutter tutorial:
 In Flutter, change notifications flow “up” the widget hierarchy by way of callbacks, while current state flows “down” to the stateless widgets that do presentation.
 ```
 
-Following this pattern requires you to set any state or state mutator callbacks that are common between your widgets down from some common ancestor.
+Following this pattern requires you to send any state or state mutator callbacks that are common between your widgets down from some common ancestor.
 With larger applications this is very tedious and leads to large widget constructors. It also means your business logic and network requests live in your widget declarations.
 built_redux gives you a predicable state container that can live outside your widgets and perform logic in action middleware.
 flutter_built_redux lets a widget to subscribe to the pieces of the redux state tree that it cares about. It also lets lets widgets dispatch actions to mutate the redux state tree.
