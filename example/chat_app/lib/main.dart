@@ -20,7 +20,7 @@ class ChatProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new InheritedStore(
+    return new ReduxProvider(
       store: store,
       child: new ChatScreen(),
     );
@@ -32,8 +32,7 @@ class ChatScreen extends StoreConnector<ChatMessages, ChatMessagesBuilder, ChatM
   ChatScreen({Key key}) : super(key: key);
 
   @override
-  ChatMessages connect(Store<ChatMessages, ChatMessagesBuilder, ChatMessagesActions> store) =>
-      store.state;
+  ChatMessages connect(ChatMessages state) => state;
 
   ChatScreenState createState() => new ChatScreenState();
 }
@@ -59,7 +58,6 @@ class ChatScreenState extends StoreConnectorState<ChatMessages, ChatMessagesBuil
               color: state.isComposing ? themeData.accentColor : themeData.disabledColor))
     ]);
   }
-  //
 
   final ChatUser me = new ChatUser();
 
@@ -97,9 +95,16 @@ class ChatMessageListItemState extends State<ChatMessageListItem>
   @override
   void initState() {
     super.initState();
-    _animationController =
-        new AnimationController(vsync: this, duration: new Duration(milliseconds: 700));
-    _animation = new CurvedAnimation(parent: _animationController, curve: Curves.easeOut);
+    _animationController = new AnimationController(
+      vsync: this,
+      duration: new Duration(milliseconds: 700),
+    );
+
+    _animation = new CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
+    );
+
     _animationController.forward();
   }
 

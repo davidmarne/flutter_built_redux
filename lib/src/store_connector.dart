@@ -13,8 +13,10 @@ abstract class StoreConnector<
     LocalStateBuilder extends Builder<LocalState, LocalStateBuilder>> extends StatefulWidget {
   StoreConnector({Key key}) : super(key: key);
 
+  /// [connect] takes the current state of the redux store and retuns an object that contains
+  /// the subset of the redux state tree that this component cares about.
   @protected
-  LocalState connect(Store<StoreState, StoreStateBuilder, Actions> store);
+  LocalState connect(StoreState state);
 }
 
 abstract class StoreConnectorState<
@@ -26,28 +28,40 @@ abstract class StoreConnectorState<
     extends State<
         StoreConnector<StoreState, StoreStateBuilder, Actions, LocalState, LocalStateBuilder>> {
   StreamSubscription<StoreChange<StoreState, StoreStateBuilder, Actions>> _storeSub;
+  ReduxProvider _reduxProvider;
 
+  /// [LocalState] is an object that contains the subset of the redux state tree that this component
+  /// cares about.
   LocalState state;
-  InheritedStore _inheritedStore;
 
   Store<StoreState, StoreStateBuilder, Actions> get store {
-    if (_inheritedStore == null) {
-      _inheritedStore = context.inheritFromWidgetOfExactType(InheritedStore);
-      if (_inheritedStore == null)
+    // get the store from the ReduxProvider ancestor
+    if (_reduxProvider == null) {
+      _reduxProvider = context.inheritFromWidgetOfExactType(ReduxProvider);
+      if (_reduxProvider == null)
         throw new Exception(
-            "Store was not found in context, make sure your component tree is wrapped in a provider");
+            "Store was not found, make sure ReduxProvider is an ancestor of this component");
     }
-    return _inheritedStore.store;
+    return _reduxProvider.store;
   }
 
+  /// [actions] returns the actions object that contains the [ActionDispatchers] associated with the redux store
   Actions get actions => store.actions;
 
+  /// setup a subscription to the store
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    state = widget.connect(store);
+
+    // set the initial state
+    state = widget.connect(store.state);
+
+    // listen to changes
     _storeSub = store.subscribe.listen((_) {
-      LocalState nextLocalState = widget.connect(store);
+      // get the next state
+      LocalState nextLocalState = widget.connect(store.state);
+
+      // if the result is different that the previous state call setState
       if (nextLocalState != state)
         setState(() {
           state = nextLocalState;
@@ -55,7 +69,7 @@ abstract class StoreConnectorState<
     });
   }
 
-  /// Cancel all store subscriptions.
+  /// Cancel the store subscription.
   @override
   @mustCallSuper
   void dispose() {
@@ -64,13 +78,14 @@ abstract class StoreConnectorState<
   }
 }
 
-/// Inject a store for descendant widgets.
-class InheritedStore extends InheritedWidget {
-  InheritedStore({Key key, @required this.store, @required Widget child})
+/// [ReduxProvider] provides access to the redux store to descendant widgets.
+class ReduxProvider extends InheritedWidget {
+  ReduxProvider({Key key, @required this.store, @required Widget child})
       : super(key: key, child: child);
 
+  /// [store] is a reference to the redux store
   final Store store;
 
   @override
-  bool updateShouldNotify(InheritedStore old) => store != old.store;
+  bool updateShouldNotify(ReduxProvider old) => store != old.store;
 }
