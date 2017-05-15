@@ -1,3 +1,5 @@
+[![Pub](https://img.shields.io/pub/v/flutter_built_redux.svg)](https://pub.dartlang.org/packages/flutter_built_redux)
+
 # flutter_built_redux
 
 [built_redux] bindings for Flutter.
