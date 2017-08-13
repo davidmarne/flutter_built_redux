@@ -27,7 +27,7 @@ abstract class StoreConnectorState<
         LocalStateBuilder extends Builder<LocalState, LocalStateBuilder>>
     extends State<
         StoreConnector<StoreState, StoreStateBuilder, Actions, LocalState, LocalStateBuilder>> {
-  StreamSubscription<StoreChange<StoreState, StoreStateBuilder, Actions>> _storeSub;
+  StreamSubscription<SubStateChange<LocalState>> _storeSub;
   ReduxProvider _reduxProvider;
 
   /// [LocalState] is an object that contains the subset of the redux state tree that this component
@@ -57,15 +57,10 @@ abstract class StoreConnectorState<
     state = widget.connect(store.state);
 
     // listen to changes
-    _storeSub = store.subscribe.listen((_) {
-      // get the next state
-      LocalState nextLocalState = widget.connect(store.state);
-
-      // if the result is different that the previous state call setState
-      if (nextLocalState != state)
-        setState(() {
-          state = nextLocalState;
-        });
+    _storeSub = store.substateStream(widget.connect).listen((change) {
+      setState(() {
+        state = change.next;
+      });
     });
   }
 
