@@ -15,6 +15,3 @@ dartdoc-viewer/
 
 # coverage
 /coverage/
-
-example/chat_app/ios
-example/chat_app/android
