@@ -17,30 +17,31 @@ abstract class ChatMessagesActions extends ReduxActions {
   factory ChatMessagesActions() => new _$ChatMessagesActions();
 }
 
-setCurrentMessageAction(ChatMessages state, Action<String> action, ChatMessagesBuilder builder) =>
+setCurrentMessageAction(ChatMessages state, Action<String> action,
+        ChatMessagesBuilder builder) =>
     builder..currentMessage = action.payload;
 
-commitCurrentMessageAction(
-        ChatMessages state, Action<ChatUser> action, ChatMessagesBuilder builder) =>
+commitCurrentMessageAction(ChatMessages state, Action<ChatUser> action,
+        ChatMessagesBuilder builder) =>
     builder
-      ..messages.add(new ChatMessage(sender: action.payload, text: state.currentMessage))
+      ..messages.add(
+          new ChatMessage(sender: action.payload, text: state.currentMessage))
       ..currentMessage = "";
 
-var _reducer = (new ReducerBuilder<ChatMessages, ChatMessagesBuilder>()
-      ..add<String>(ChatMessagesActionsNames.setCurrentMessageAction, setCurrentMessageAction)
-      ..add<ChatUser>(
-          ChatMessagesActionsNames.commitCurrentMessageAction, commitCurrentMessageAction))
+createReducer() => (new ReducerBuilder<ChatMessages, ChatMessagesBuilder>()
+      ..add<String>(ChatMessagesActionsNames.setCurrentMessageAction,
+          setCurrentMessageAction)
+      ..add<ChatUser>(ChatMessagesActionsNames.commitCurrentMessageAction,
+          commitCurrentMessageAction))
     .build();
 
-abstract class ChatMessages extends BuiltReducer<ChatMessages, ChatMessagesBuilder>
+abstract class ChatMessages
     implements Built<ChatMessages, ChatMessagesBuilder> {
   BuiltList<ChatMessage> get messages;
   String get currentMessage;
 
   @memoized
   bool get isComposing => currentMessage != "";
-
-  get reducer => _reducer;
 
   // Built value boilerplate
   ChatMessages._();

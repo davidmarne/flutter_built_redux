@@ -6,11 +6,12 @@ import 'package:built_redux/built_redux.dart';
 import 'package:built_value/built_value.dart';
 
 abstract class StoreConnector<
-    StoreState extends BuiltReducer<StoreState, StoreStateBuilder>,
-    StoreStateBuilder extends Builder<StoreState, StoreStateBuilder>,
-    Actions extends ReduxActions,
-    LocalState extends Built<LocalState, LocalStateBuilder>,
-    LocalStateBuilder extends Builder<LocalState, LocalStateBuilder>> extends StatefulWidget {
+        StoreState extends Built<StoreState, StoreStateBuilder>,
+        StoreStateBuilder extends Builder<StoreState, StoreStateBuilder>,
+        Actions extends ReduxActions,
+        LocalState extends Built<LocalState, LocalStateBuilder>,
+        LocalStateBuilder extends Builder<LocalState, LocalStateBuilder>>
+    extends StatefulWidget {
   StoreConnector({Key key}) : super(key: key);
 
   /// [connect] takes the current state of the redux store and retuns an object that contains
@@ -20,14 +21,15 @@ abstract class StoreConnector<
 }
 
 abstract class StoreConnectorState<
-        StoreState extends BuiltReducer<StoreState, StoreStateBuilder>,
+        StoreState extends Built<StoreState, StoreStateBuilder>,
         StoreStateBuilder extends Builder<StoreState, StoreStateBuilder>,
         Actions extends ReduxActions,
         LocalState extends Built<LocalState, LocalStateBuilder>,
         LocalStateBuilder extends Builder<LocalState, LocalStateBuilder>>
     extends State<
-        StoreConnector<StoreState, StoreStateBuilder, Actions, LocalState, LocalStateBuilder>> {
-  StreamSubscription<SubStateChange<LocalState>> _storeSub;
+        StoreConnector<StoreState, StoreStateBuilder, Actions, LocalState,
+            LocalStateBuilder>> {
+  StreamSubscription<SubstateChange<LocalState>> _storeSub;
   ReduxProvider _reduxProvider;
 
   /// [LocalState] is an object that contains the subset of the redux state tree that this component

@@ -8,12 +8,15 @@ import './models.dart';
 void main() {
   runApp(new MaterialApp(
       title: 'Chat',
-      theme: new ThemeData(primarySwatch: Colors.purple, accentColor: Colors.orangeAccent[400]),
+      theme: new ThemeData(
+          primarySwatch: Colors.purple, accentColor: Colors.orangeAccent[400]),
       home: new ChatProvider()));
 }
 
 class ChatProvider extends StatelessWidget {
-  final store = new Store<ChatMessages, ChatMessagesBuilder, ChatMessagesActions>(
+  final store =
+      new Store<ChatMessages, ChatMessagesBuilder, ChatMessagesActions>(
+    createReducer(),
     new ChatMessages(),
     new ChatMessagesActions(),
   );
@@ -27,8 +30,8 @@ class ChatProvider extends StatelessWidget {
   }
 }
 
-class ChatScreen extends StoreConnector<ChatMessages, ChatMessagesBuilder, ChatMessagesActions,
-    ChatMessages, ChatMessagesBuilder> {
+class ChatScreen extends StoreConnector<ChatMessages, ChatMessagesBuilder,
+    ChatMessagesActions, ChatMessages, ChatMessagesBuilder> {
   ChatScreen({Key key}) : super(key: key);
 
   @override
@@ -37,8 +40,12 @@ class ChatScreen extends StoreConnector<ChatMessages, ChatMessagesBuilder, ChatM
   ChatScreenState createState() => new ChatScreenState();
 }
 
-class ChatScreenState extends StoreConnectorState<ChatMessages, ChatMessagesBuilder,
-    ChatMessagesActions, ChatMessages, ChatMessagesBuilder> {
+class ChatScreenState extends StoreConnectorState<
+    ChatMessages,
+    ChatMessagesBuilder,
+    ChatMessagesActions,
+    ChatMessages,
+    ChatMessagesBuilder> {
   Widget _buildTextComposer(BuildContext context) {
     ThemeData themeData = Theme.of(context);
     return new Row(children: <Widget>[
@@ -54,8 +61,12 @@ class ChatScreenState extends StoreConnectorState<ChatMessages, ChatMessagesBuil
           margin: new EdgeInsets.symmetric(horizontal: 4.0),
           child: new IconButton(
               icon: new Icon(Icons.send),
-              onPressed: state.isComposing ? () => actions.commitCurrentMessageAction(me) : null,
-              color: state.isComposing ? themeData.accentColor : themeData.disabledColor))
+              onPressed: state.isComposing
+                  ? () => actions.commitCurrentMessageAction(me)
+                  : null,
+              color: state.isComposing
+                  ? themeData.accentColor
+                  : themeData.disabledColor))
     ]);
   }
 
@@ -123,7 +134,8 @@ class ChatMessageListItemState extends State<ChatMessageListItem>
         child: new ListTile(
             dense: true,
             leading: new CircleAvatar(
-                child: new Text(message.sender.name[0]), backgroundColor: message.sender.color),
+                child: new Text(message.sender.name[0]),
+                backgroundColor: message.sender.color),
             title: new Text(message.sender.name),
             subtitle: new Text(message.text)));
   }

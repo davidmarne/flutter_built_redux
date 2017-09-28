@@ -3,37 +3,16 @@
 part of chat_messages;
 
 // **************************************************************************
-// Generator: BuiltReduxGenerator
-// Target: abstract class ChatMessagesActions
-// **************************************************************************
-
-class _$ChatMessagesActions extends ChatMessagesActions {
-  ActionDispatcher<ChatUser> commitCurrentMessageAction =
-      new ActionDispatcher<ChatUser>(
-          'ChatMessagesActions-commitCurrentMessageAction');
-
-  ActionDispatcher<String> setCurrentMessageAction =
-      new ActionDispatcher<String>(
-          'ChatMessagesActions-setCurrentMessageAction');
-  factory _$ChatMessagesActions() => new _$ChatMessagesActions._();
-  _$ChatMessagesActions._() : super._();
-  syncWithStore(dispatcher) {
-    commitCurrentMessageAction.syncWithStore(dispatcher);
-    setCurrentMessageAction.syncWithStore(dispatcher);
-  }
-}
-
-class ChatMessagesActionsNames {
-  static ActionName commitCurrentMessageAction = new ActionName<ChatUser>(
-      'ChatMessagesActions-commitCurrentMessageAction');
-  static ActionName setCurrentMessageAction =
-      new ActionName<String>('ChatMessagesActions-setCurrentMessageAction');
-}
-
-// **************************************************************************
 // Generator: BuiltValueGenerator
-// Target: abstract class ChatMessages
 // **************************************************************************
+
+// ignore_for_file: always_put_control_body_on_new_line
+// ignore_for_file: annotate_overrides
+// ignore_for_file: avoid_annotating_with_dynamic
+// ignore_for_file: avoid_returning_this
+// ignore_for_file: omit_local_variable_types
+// ignore_for_file: prefer_expression_function_bodies
+// ignore_for_file: sort_constructors_first
 
 class _$ChatMessages extends ChatMessages {
   @override
@@ -121,10 +100,41 @@ class ChatMessagesBuilder
 
   @override
   _$ChatMessages build() {
-    final result = _$v ??
+    final _$result = _$v ??
         new _$ChatMessages._(
             messages: messages?.build(), currentMessage: currentMessage);
-    replace(result);
-    return result;
+    replace(_$result);
+    return _$result;
   }
+}
+
+// **************************************************************************
+// Generator: BuiltReduxGenerator
+// **************************************************************************
+
+class _$ChatMessagesActions extends ChatMessagesActions {
+  final ActionDispatcher<ChatUser> commitCurrentMessageAction =
+      new ActionDispatcher<ChatUser>(
+          'ChatMessagesActions-commitCurrentMessageAction');
+
+  final ActionDispatcher<String> setCurrentMessageAction =
+      new ActionDispatcher<String>(
+          'ChatMessagesActions-setCurrentMessageAction');
+  factory _$ChatMessagesActions() => new _$ChatMessagesActions._();
+
+  _$ChatMessagesActions._() : super._();
+
+  @override
+  void setDispatcher(Dispatcher dispatcher) {
+    commitCurrentMessageAction.setDispatcher(dispatcher);
+    setCurrentMessageAction.setDispatcher(dispatcher);
+  }
+}
+
+class ChatMessagesActionsNames {
+  static final ActionName<ChatUser> commitCurrentMessageAction =
+      new ActionName<ChatUser>(
+          'ChatMessagesActions-commitCurrentMessageAction');
+  static final ActionName<String> setCurrentMessageAction =
+      new ActionName<String>('ChatMessagesActions-setCurrentMessageAction');
 }
