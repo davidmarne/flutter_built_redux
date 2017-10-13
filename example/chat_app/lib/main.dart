@@ -31,22 +31,14 @@ class ChatProvider extends StatelessWidget {
 }
 
 class ChatScreen extends StoreConnector<ChatMessages, ChatMessagesBuilder,
-    ChatMessagesActions, ChatMessages, ChatMessagesBuilder> {
+    ChatMessagesActions, ChatMessages> {
   ChatScreen({Key key}) : super(key: key);
 
   @override
   ChatMessages connect(ChatMessages state) => state;
 
-  ChatScreenState createState() => new ChatScreenState();
-}
-
-class ChatScreenState extends StoreConnectorState<
-    ChatMessages,
-    ChatMessagesBuilder,
-    ChatMessagesActions,
-    ChatMessages,
-    ChatMessagesBuilder> {
-  Widget _buildTextComposer(BuildContext context) {
+  Widget _buildTextComposer(
+      BuildContext context, ChatMessages state, ChatMessagesActions actions) {
     ThemeData themeData = Theme.of(context);
     return new Row(children: <Widget>[
       new Flexible(
@@ -73,70 +65,23 @@ class ChatScreenState extends StoreConnectorState<
   final ChatUser me = new ChatUser();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context, ChatMessages state, ChatMessagesActions actions) {
     return new Scaffold(
       appBar: new AppBar(title: new Text('Chatting as ${me.name}')),
       body: new ListView(
         padding: new EdgeInsets.symmetric(vertical: 8.0),
         children: state.messages.map((ChatMessage message) {
-          return new ChatMessageListItem(message);
+          return new ListTile(
+              dense: true,
+              leading: new CircleAvatar(
+                  child: new Text(message.sender.name[0]),
+                  backgroundColor: message.sender.color),
+              title: new Text(message.sender.name),
+              subtitle: new Text(message.text));
         }).toList(),
       ),
-      bottomNavigationBar: _buildTextComposer(context),
+      bottomNavigationBar: _buildTextComposer(context, state, actions),
     );
-  }
-}
-
-class ChatMessageListItem extends StatefulWidget {
-  ChatMessageListItem(ChatMessage m)
-      : message = m,
-        super(key: new ObjectKey(m));
-
-  final ChatMessage message;
-
-  @override
-  State createState() => new ChatMessageListItemState();
-}
-
-class ChatMessageListItemState extends State<ChatMessageListItem>
-    with SingleTickerProviderStateMixin {
-  AnimationController _animationController;
-  Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = new AnimationController(
-      vsync: this,
-      duration: new Duration(milliseconds: 700),
-    );
-
-    _animation = new CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOut,
-    );
-
-    _animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final ChatMessage message = widget.message;
-    return new SizeTransition(
-        sizeFactor: _animation,
-        axisAlignment: 0.0,
-        child: new ListTile(
-            dense: true,
-            leading: new CircleAvatar(
-                child: new Text(message.sender.name[0]),
-                backgroundColor: message.sender.color),
-            title: new Text(message.sender.name),
-            subtitle: new Text(message.text)));
   }
 }
