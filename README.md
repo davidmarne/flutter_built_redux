@@ -4,7 +4,7 @@
 
 [built_redux] bindings for Flutter.
 
-By creating a StatefulWidget that extends StoreConnector/StoreConnectorState you get automatic subscribing to your redux store, and you component will only call setState when the store triggers and the values you take from the store in connect change!
+By creating a Widget that extends StoreConnector you get automatic subscribing to your redux store, and you component will only call setState when the store triggers and the values you take from the store in connect change!
 
 ### Why you may need flutter_built_redux
 For the same reason you would want to use redux with react.
@@ -47,7 +47,7 @@ creating a implementing connect & implement the build method.
 ```dart
 
 // first 3 generics are the redux store value, builder and actions, while the last
-// two are the subscribed values value and builder.
+// one is the local state's value.
 class MyWidget extends StoreConnector<MyReduxState, MyReduxStateBuilder, MyReduxStateActions, String> {
   MyWidget({Key key}) : super(key: key);
 
@@ -56,6 +56,7 @@ class MyWidget extends StoreConnector<MyReduxState, MyReduxStateBuilder, MyRedux
   // your store that this component cares about. It requires that you return a
   // comparable type to ensure your props setState is only called when necessary.
   // Primitive types, built values, and collections are recommended.
+  // The result of connect is what gets passed to your build function's second param
   @override
   MyWidgetProps connect(Store<MyReduxState, MyReduxStateBuilder, MyReduxStateActions> store) =>
       store.state.someProperty;
