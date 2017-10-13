@@ -5,38 +5,45 @@ import 'package:flutter/widgets.dart' hide Builder;
 import 'package:built_redux/built_redux.dart';
 import 'package:built_value/built_value.dart';
 
+/// [StoreConnector] is a widget that rebuilds when the redux store
+/// has triggered and the connect function yields a new result.
+/// [LocalState] should be comparable. It is recommended to only use primitive and built types.
 abstract class StoreConnector<
-        StoreState extends Built<StoreState, StoreStateBuilder>,
-        StoreStateBuilder extends Builder<StoreState, StoreStateBuilder>,
-        Actions extends ReduxActions,
-        LocalState extends Built<LocalState, LocalStateBuilder>,
-        LocalStateBuilder extends Builder<LocalState, LocalStateBuilder>>
-    extends StatefulWidget {
+    StoreState extends Built<StoreState, StoreStateBuilder>,
+    StoreStateBuilder extends Builder<StoreState, StoreStateBuilder>,
+    Actions extends ReduxActions,
+    LocalState> extends StatefulWidget {
   StoreConnector({Key key}) : super(key: key);
 
   /// [connect] takes the current state of the redux store and retuns an object that contains
   /// the subset of the redux state tree that this component cares about.
   @protected
   LocalState connect(StoreState state);
+
+  @override
+  StoreConnectorState<StoreState, StoreStateBuilder, Actions, LocalState>
+      createState() => new StoreConnectorState<StoreState, StoreStateBuilder,
+          Actions, LocalState>();
+
+  @protected
+  Widget build(BuildContext context, LocalState state, Actions actions);
 }
 
-abstract class StoreConnectorState<
+class StoreConnectorState<
         StoreState extends Built<StoreState, StoreStateBuilder>,
         StoreStateBuilder extends Builder<StoreState, StoreStateBuilder>,
         Actions extends ReduxActions,
-        LocalState extends Built<LocalState, LocalStateBuilder>,
-        LocalStateBuilder extends Builder<LocalState, LocalStateBuilder>>
+        LocalState>
     extends State<
-        StoreConnector<StoreState, StoreStateBuilder, Actions, LocalState,
-            LocalStateBuilder>> {
+        StoreConnector<StoreState, StoreStateBuilder, Actions, LocalState>> {
   StreamSubscription<SubstateChange<LocalState>> _storeSub;
   ReduxProvider _reduxProvider;
 
   /// [LocalState] is an object that contains the subset of the redux state tree that this component
   /// cares about.
-  LocalState state;
+  LocalState _state;
 
-  Store<StoreState, StoreStateBuilder, Actions> get store {
+  Store<StoreState, StoreStateBuilder, Actions> get _store {
     // get the store from the ReduxProvider ancestor
     if (_reduxProvider == null) {
       _reduxProvider = context.inheritFromWidgetOfExactType(ReduxProvider);
@@ -47,21 +54,18 @@ abstract class StoreConnectorState<
     return _reduxProvider.store;
   }
 
-  /// [actions] returns the actions object that contains the [ActionDispatchers] associated with the redux store
-  Actions get actions => store.actions;
-
   /// setup a subscription to the store
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     // set the initial state
-    state = widget.connect(store.state);
+    _state = widget.connect(_store.state);
 
     // listen to changes
-    _storeSub = store.substateStream(widget.connect).listen((change) {
+    _storeSub = _store.substateStream(widget.connect).listen((change) {
       setState(() {
-        state = change.next;
+        _state = change.next;
       });
     });
   }
@@ -72,6 +76,11 @@ abstract class StoreConnectorState<
   void dispose() {
     _storeSub.cancel();
     super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.build(context, _state, _store.actions);
   }
 }
 

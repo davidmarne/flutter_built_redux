@@ -24,7 +24,7 @@ flutter_built_redux lets a widget to subscribe to the pieces of the redux state 
 ### Consuming
 
 Wrap your top-level flutter widget with ReduxProvider
-```
+```dart
 class MyProviderWidget extends StatelessWidget {
   final store = new Store<MyReduxState, MyReduxStateBuilder, MyReduxStateActions>(
     new MyReduxState(),
@@ -41,45 +41,27 @@ class MyProviderWidget extends StatelessWidget {
 }
 ```
 
+Write a widget that extends StoreConnector.
 Declare the properties from your state you want this widget to subscribe to by
-creating a new built value.
-```
-abstract class MyWidgetProps implements Built<MyWidgetProps, MyWidgetPropsBuilder> {
-  String get propIWantFromMyReduxState;
-
-  // Built value boilerplate
-  MyWidgetProps._();
-  factory MyWidgetProps([updates(MyWidgetPropsBuilder b)]) => _$MyWidgetProps;
-}
+creating a implementing connect & implement the build method.
+```dart
 
 // first 3 generics are the redux store value, builder and actions, while the last
 // two are the subscribed values value and builder.
-class MyWidget extends StoreConnector<MyReduxState, MyReduxStateBuilder, MyReduxStateActions,
-    MyWidgetProps, MyWidgetPropsBuilder> {
+class MyWidget extends StoreConnector<MyReduxState, MyReduxStateBuilder, MyReduxStateActions, String> {
   MyWidget({Key key}) : super(key: key);
 
 
   // connect is the function that returns an object containing the properties from
   // your store that this component cares about. It requires that you return a
-  // built_value to ensure your props has a valid == override so setState
-  // is only called if the properties this component cares about change.
+  // comparable type to ensure your props setState is only called when necessary.
+  // Primitive types, built values, and collections are recommended.
   @override
   MyWidgetProps connect(Store<MyReduxState, MyReduxStateBuilder, MyReduxStateActions> store) =>
-      new MyWidgetProps((b) => b..propIWantFromMyReduxState = store.state.someProperty)
-
-  MyWidgetState createState() => new MyWidgetState();
-}
-
-class MyWidgetState extends StoreConnectorState<MyReduxState, MyReduxStateBuilder,
-    MyReduxStateActions, MyWidgetProps, MyWidgetPropsBuilder> {
-
-  // by extending StoreConnectorState you inherit a state property. In this case
-  // it would be of type MyWidgetProps.
-  //
-  // you also inherit an actions property, which is of type MyReduxStateActions
+      store.state.someProperty;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, MyWidgetProps props, MyReduxStateActions action) {
     return new Center(
       child: new Text(state.propIWantFromMyReduxState),
     );
