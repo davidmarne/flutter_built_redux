@@ -52,14 +52,13 @@ class MyWidget extends StoreConnector<MyReduxState, MyReduxStateBuilder, MyRedux
   MyWidget({Key key}) : super(key: key);
 
 
-  // connect is the function that returns an object containing the properties from
+  // connect is the function that returns an object containing the data from
   // your store that this component cares about. It requires that you return a
   // comparable type to ensure your props setState is only called when necessary.
   // Primitive types, built values, and collections are recommended.
   // The result of connect is what gets passed to your build function's second param
   @override
-  MyWidgetProps connect(Store<MyReduxState, MyReduxStateBuilder, MyReduxStateActions> store) =>
-      store.state.someProperty;
+  MyWidgetProps connect(MyReduxState state) => state.someProperty;
 
   @override
   Widget build(BuildContext context, MyWidgetProps props, MyReduxStateActions action) {
