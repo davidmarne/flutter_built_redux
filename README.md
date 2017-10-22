@@ -63,7 +63,7 @@ class MyWidget extends StoreConnector<MyReduxState, MyReduxStateBuilder, MyRedux
   @override
   Widget build(BuildContext context, MyWidgetProps props, MyReduxStateActions action) {
     return new Center(
-      child: new Text(state.propIWantFromMyReduxState),
+      child: new Text(state.someProperty),
     );
   }
 ```
