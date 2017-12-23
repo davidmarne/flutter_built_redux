@@ -55,20 +55,11 @@ class StoreConnectorState<
     return _reduxProvider.store;
   }
 
-  /// setup a subscription to the store
-  @override
-  @mustCallSuper
-  void initState() {
-    super.initState();
-
-    _subscribe();
-  }
-
   @override
   @mustCallSuper
   void didUpdateWidget(StoreConnector oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget._storeSub != widget._storeSub) {
+    if (widget._storeSub == null || oldWidget._storeSub != widget._storeSub) {
       _subscribe();
     }
   }
