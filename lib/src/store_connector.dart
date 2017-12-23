@@ -15,6 +15,8 @@ abstract class StoreConnector<
     LocalState> extends StatefulWidget {
   StoreConnector({Key key}) : super(key: key);
 
+  StreamSubscription<SubstateChange<LocalState>> _storeSub;
+
   /// [connect] takes the current state of the redux store and retuns an object that contains
   /// the subset of the redux state tree that this component cares about.
   @protected
@@ -36,7 +38,6 @@ class StoreConnectorState<
         LocalState>
     extends State<
         StoreConnector<StoreState, StoreStateBuilder, Actions, LocalState>> {
-  StreamSubscription<SubstateChange<LocalState>> _storeSub;
   ReduxProvider _reduxProvider;
 
   /// [LocalState] is an object that contains the subset of the redux state tree that this component
@@ -56,31 +57,51 @@ class StoreConnectorState<
 
   /// setup a subscription to the store
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  @mustCallSuper
+  void initState() {
+    super.initState();
 
-    // set the initial state
-    _state = widget.connect(_store.state);
+    _subscribe();
+  }
 
-    // listen to changes
-    _storeSub = _store.substateStream(widget.connect).listen((change) {
-      setState(() {
-        _state = change.next;
-      });
-    });
+  @override
+  @mustCallSuper
+  void didUpdateWidget(StoreConnector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget._storeSub != widget._storeSub) {
+      _subscribe();
+    }
   }
 
   /// Cancel the store subscription.
   @override
   @mustCallSuper
   void dispose() {
-    _storeSub.cancel();
+    _unsubscribe();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return widget.build(context, _state, _store.actions);
+  }
+
+  _subscribe() {
+    // set the initial state
+    _state = widget.connect(_store.state);
+
+    _unsubscribe();
+    // listen to changes
+    widget._storeSub = _store.substateStream(widget.connect).listen((change) {
+      setState(() {
+        _state = change.next;
+      });
+    });
+  }
+
+  void _unsubscribe() {
+    widget._storeSub?.cancel();
+    widget._storeSub = null;
   }
 }
 
