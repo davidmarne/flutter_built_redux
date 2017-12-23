@@ -15,8 +15,6 @@ abstract class StoreConnector<
     LocalState> extends StatefulWidget {
   StoreConnector({Key key}) : super(key: key);
 
-  StreamSubscription<SubstateChange<LocalState>> _storeSub;
-
   /// [connect] takes the current state of the redux store and retuns an object that contains
   /// the subset of the redux state tree that this component cares about.
   @protected
@@ -40,6 +38,8 @@ class StoreConnectorState<
         StoreConnector<StoreState, StoreStateBuilder, Actions, LocalState>> {
   ReduxProvider _reduxProvider;
 
+  StreamSubscription<SubstateChange<LocalState>> _storeSub;
+
   /// [LocalState] is an object that contains the subset of the redux state tree that this component
   /// cares about.
   LocalState _state;
@@ -60,18 +60,14 @@ class StoreConnectorState<
   @mustCallSuper
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (widget._storeSub == null) {
-      _subscribe();
-    }
+    _subscribe();
   }
 
   @override
   @mustCallSuper
   void didUpdateWidget(StoreConnector oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget._storeSub == null || oldWidget._storeSub != widget._storeSub) {
-      _subscribe();
-    }
+    _subscribe();
   }
 
   /// Cancel the store subscription.
@@ -93,7 +89,7 @@ class StoreConnectorState<
 
     _unsubscribe();
     // listen to changes
-    widget._storeSub = _store.substateStream(widget.connect).listen((change) {
+    _storeSub = _store.substateStream(widget.connect).listen((change) {
       setState(() {
         _state = change.next;
       });
@@ -101,8 +97,8 @@ class StoreConnectorState<
   }
 
   void _unsubscribe() {
-    widget._storeSub?.cancel();
-    widget._storeSub = null;
+    _storeSub?.cancel();
+    _storeSub = null;
   }
 }
 
