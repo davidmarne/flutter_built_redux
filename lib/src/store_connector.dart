@@ -55,6 +55,16 @@ class StoreConnectorState<
     return _reduxProvider.store;
   }
 
+
+  @override
+  @mustCallSuper
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget._storeSub == null) {
+      _subscribe();
+    }
+  }
+
   @override
   @mustCallSuper
   void didUpdateWidget(StoreConnector oldWidget) {
@@ -67,9 +77,9 @@ class StoreConnectorState<
   /// Cancel the store subscription.
   @override
   @mustCallSuper
-  void dispose() {
+  void deactivate() {
     _unsubscribe();
-    super.dispose();
+    super.deactivate();
   }
 
   @override
