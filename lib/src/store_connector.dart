@@ -60,13 +60,6 @@ class StoreConnectorState<
     _subscribe();
   }
 
-  @override
-  @mustCallSuper
-  void didUpdateWidget(StoreConnector oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _subscribe();
-  }
-
   /// Cancel the store subscription.
   @override
   @mustCallSuper
