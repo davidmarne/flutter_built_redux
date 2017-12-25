@@ -36,7 +36,6 @@ class StoreConnectorState<
         LocalState>
     extends State<
         StoreConnector<StoreState, StoreStateBuilder, Actions, LocalState>> {
-  ReduxProvider _reduxProvider;
 
   StreamSubscription<SubstateChange<LocalState>> _storeSub;
 
@@ -46,13 +45,11 @@ class StoreConnectorState<
 
   Store<StoreState, StoreStateBuilder, Actions> get _store {
     // get the store from the ReduxProvider ancestor
-    if (_reduxProvider == null) {
-      _reduxProvider = context.inheritFromWidgetOfExactType(ReduxProvider);
-      if (_reduxProvider == null)
+    ReduxProvider reduxProvider = context.inheritFromWidgetOfExactType(ReduxProvider);
+      if (reduxProvider == null)
         throw new Exception(
             "Store was not found, make sure ReduxProvider is an ancestor of this component");
-    }
-    return _reduxProvider.store;
+    return reduxProvider.store;
   }
 
 
