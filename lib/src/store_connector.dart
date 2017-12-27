@@ -36,8 +36,8 @@ class StoreConnectorState<
         LocalState>
     extends State<
         StoreConnector<StoreState, StoreStateBuilder, Actions, LocalState>> {
+
   StreamSubscription<SubstateChange<LocalState>> _storeSub;
-  ReduxProvider _reduxProvider;
 
   /// [LocalState] is an object that contains the subset of the redux state tree that this component
   /// cares about.
@@ -45,23 +45,39 @@ class StoreConnectorState<
 
   Store<StoreState, StoreStateBuilder, Actions> get _store {
     // get the store from the ReduxProvider ancestor
-    if (_reduxProvider == null) {
-      _reduxProvider = context.inheritFromWidgetOfExactType(ReduxProvider);
-      if (_reduxProvider == null)
+    ReduxProvider reduxProvider = context.inheritFromWidgetOfExactType(ReduxProvider);
+      if (reduxProvider == null)
         throw new Exception(
             "Store was not found, make sure ReduxProvider is an ancestor of this component");
-    }
-    return _reduxProvider.store;
+    return reduxProvider.store;
   }
 
-  /// setup a subscription to the store
+
   @override
+  @mustCallSuper
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _subscribe();
+  }
 
+  /// Cancel the store subscription.
+  @override
+  @mustCallSuper
+  void deactivate() {
+    _unsubscribe();
+    super.deactivate();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.build(context, _state, _store.actions);
+  }
+
+  _subscribe() {
     // set the initial state
     _state = widget.connect(_store.state);
 
+    _unsubscribe();
     // listen to changes
     _storeSub = _store.substateStream(widget.connect).listen((change) {
       setState(() {
@@ -70,17 +86,9 @@ class StoreConnectorState<
     });
   }
 
-  /// Cancel the store subscription.
-  @override
-  @mustCallSuper
-  void dispose() {
-    _storeSub.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.build(context, _state, _store.actions);
+  void _unsubscribe() {
+    _storeSub?.cancel();
+    _storeSub = null;
   }
 }
 
