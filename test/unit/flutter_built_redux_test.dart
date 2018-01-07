@@ -1,9 +1,6 @@
-import 'dart:async';
-
 import 'package:built_redux/built_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_built_redux/flutter_built_redux.dart';
 
 import 'test_models.dart';
 import 'test_widget.dart';
