@@ -1,12 +1,15 @@
 [![Pub](https://img.shields.io/pub/v/flutter_built_redux.svg)](https://pub.dartlang.org/packages/flutter_built_redux)
 
+[![codecov.io](http://codecov.io/github/davidmarne/flutter_built_redux/coverage.svg?branch=master)](http://codecov.io/github/davidmarne/flutter_built_redux?branch=master)
+
 # flutter_built_redux
 
 [built_redux] bindings for Flutter.
 
 By creating a Widget that extends StoreConnector you get automatic subscribing to your redux store, and you component will only call setState when the store triggers and the values you take from the store in connect change!
 
-### Why you may need flutter_built_redux
+## Why you may need flutter_built_redux
+
 For the same reason you would want to use redux with react.
 
 from the flutter tutorial:
@@ -21,9 +24,10 @@ With larger applications this is very tedious, leads to large widget constructor
 
 flutter_built_redux lets a widget to subscribe to the pieces of the redux state tree that it cares about. It also lets lets widgets dispatch actions to mutate the redux state tree. This means widgets can access and mutate application state without the state and state mutator callbacks being passed down from its ancestors!
 
-### Consuming
+## Consuming
 
 Wrap your top-level flutter widget with ReduxProvider
+
 ```dart
 class MyProviderWidget extends StatelessWidget {
   final store = new Store<MyReduxState, MyReduxStateBuilder, MyReduxStateActions>(
@@ -44,6 +48,7 @@ class MyProviderWidget extends StatelessWidget {
 Write a widget that extends StoreConnector.
 Declare the properties from your state you want this widget to subscribe to by
 creating a implementing connect & implement the build method.
+
 ```dart
 
 // first 3 generics are the redux store value, builder and actions, while the last
