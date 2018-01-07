@@ -8,6 +8,10 @@
 
 By creating a Widget that extends StoreConnector you get automatic subscribing to your redux store, and you component will only call setState when the store triggers and the values you take from the store in connect change!
 
+## Examples
+
+[todo_mvc], written by [Brian Egan]
+
 ## Why you may need flutter_built_redux
 
 For the same reason you would want to use redux with react.
@@ -74,3 +78,7 @@ class MyWidget extends StoreConnector<MyReduxState, MyReduxStateBuilder, MyRedux
 ```
 
 [built_redux]: https://github.com/davidmarne/built_redux
+
+[todo_mvc]: https://gitlab.com/brianegan/flutter_architecture_samples/tree/master/example/built_redux
+
+[Brian Egan]: https://gitlab.com/brianegan
