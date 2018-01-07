@@ -1,7 +1,7 @@
 # Important: Use "flutter packages get", not "pub get".
 name: flutter_built_redux
 author: David Marne <davemarne@gmail.com>
-version: 0.4.0
+version: 0.4.1
 description: Built_redux provider for Flutter
 homepage: https://github.com/davidmarne/flutter_built_redux
 dependencies:
