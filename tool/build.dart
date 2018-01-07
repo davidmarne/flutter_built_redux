@@ -13,7 +13,7 @@ Future main(List<String> args) async {
           new BuiltValueGenerator(),
           new BuiltReduxGenerator(),
         ]),
-        'chat_app',
-        inputs: const ['lib/**/*.dart'])
+        'flutter_built_redux',
+        inputs: const ['test/unit/test_models.dart'])
   ], deleteFilesByDefault: true);
 }

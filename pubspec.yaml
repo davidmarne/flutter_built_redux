@@ -11,5 +11,11 @@ dependencies:
   built_redux: ">=6.1.1 <8.0.0"
   built_value: ^4.0.0
 
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: ^0.6.0
+  built_value_generator: ^4.1.0
+
 environment:
   sdk: ">=1.19.0 <2.0.0"
