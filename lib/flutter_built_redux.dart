@@ -44,20 +44,14 @@ class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
         context.inheritFromWidgetOfExactType(ReduxProvider);
 
     // if it is not found raise an error
-    if (reduxProvider == null) {
-      throw new Exception(
-          'Store was not found, make sure ReduxProvider is an ancestor of this component.');
-    }
+    assert(reduxProvider != null,
+        'Store was not found, make sure ReduxProvider is an ancestor of this component.');
 
-    if (reduxProvider.store.state is! StoreState) {
-      throw new Exception(
-          'Store found was not the correct type, make sure StoreConnector\'s generic for StoreState matches the state type of your built_redux store.');
-    }
+    assert(reduxProvider.store.state is StoreState,
+        'Store found was not the correct type, make sure StoreConnector\'s generic for StoreState matches the state type of your built_redux store.');
 
-    if (reduxProvider.store.actions is! Actions) {
-      throw new Exception(
-          'Store found was not the correct type, make sure StoreConnector\'s generic for Actions matches the actions type of your built_redux store.');
-    }
+    assert(reduxProvider.store.actions is Actions,
+        'Store found was not the correct type, make sure StoreConnector\'s generic for Actions matches the actions type of your built_redux store.');
 
     return reduxProvider.store;
   }

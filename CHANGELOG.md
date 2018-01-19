@@ -1,3 +1,7 @@
+## 0.4.2
+
+* Use assert for type assertions rather than thowing exceptions
+
 ## 0.4.1
 
 * Add changelog
