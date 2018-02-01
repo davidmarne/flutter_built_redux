@@ -1,3 +1,7 @@
+## 0.4.3
+
+* Move built_value dependency to dev_dependencies and bump to ^5.0.0
+
 ## 0.4.2
 
 * Use assert for type assertions rather than thowing exceptions
