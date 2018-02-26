@@ -14,6 +14,6 @@ Future main(List<String> args) async {
           new BuiltReduxGenerator(),
         ]),
         'flutter_built_redux',
-        inputs: const ['test/unit/test_models.dart'])
+        inputs: const ['test/unit/test_models.dart', 'example/example.dart'])
   ], deleteFilesByDefault: true);
 }

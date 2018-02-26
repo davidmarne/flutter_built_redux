@@ -4,6 +4,50 @@ import 'package:meta/meta.dart';
 import 'package:flutter/widgets.dart' hide Builder;
 import 'package:built_redux/built_redux.dart';
 
+/// [StoreConnection] is a widget that rebuilds when the redux store
+/// has triggered and the connect function yields a new result. It is an implementation
+/// of `StoreConnector` that takes a connect function and builder function as parameters
+/// so `StoreConnector` doesn't have to be implemented manually.
+///
+/// [connect] takes the current state of the redux store and retuns an object that contains
+/// the subset of the redux state tree that this component cares about.
+/// It requires that you return a comparable type to ensure your props setState is only called when necessary.
+/// Primitive types, built values, and collections are recommended.
+/// The result of [connect] is what gets passed to the build function's second param
+///
+/// [builder] is a function that takes a `BuildContext`, the `LocalState` returned from
+/// connect, and your `ReduxActions` class and returns a widget.
+///
+/// [StoreState] is the generic type of your built_redux store's state object
+/// [Actions] is the generic tyoe of your built_redux store's actions contiainer
+/// [LocalState] is the state from your store that this widget needs to render.
+/// [LocalState] should be comparable. It is recommended to only use primitive or built types.
+class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
+    extends StoreConnector<StoreState, Actions, LocalState> {
+  final LocalState Function(StoreState state) _connect;
+  final Widget Function(BuildContext context, LocalState state, Actions actions)
+      _builder;
+
+  StoreConnection({
+    @required LocalState connect(StoreState state),
+    @required
+        Widget builder(BuildContext context, LocalState state, Actions actions),
+    Key key,
+  })
+      : assert(connect != null, 'StoreConnection: connect must not be null'),
+        assert(builder != null, 'StoreConnection: builder must not be null'),
+        _connect = connect,
+        _builder = builder,
+        super(key: key);
+
+  @protected
+  LocalState connect(StoreState state) => _connect(state);
+
+  @protected
+  Widget build(BuildContext context, LocalState state, Actions actions) =>
+      _builder(context, state, actions);
+}
+
 /// [StoreConnector] is a widget that rebuilds when the redux store
 /// has triggered and the connect function yields a new result.
 /// [StoreState] is the generic type of your built_redux store's state object
@@ -93,7 +137,7 @@ class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
 
   @override
   Widget build(BuildContext context) =>
-      widget.build(context, _state, _store.actions);
+      widget.build(context, _state, _store.actions as Actions);
 }
 
 /// [ReduxProvider] provides access to the redux store to descendant widgets.
