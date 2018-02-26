@@ -7,6 +7,19 @@ import 'package:built_value/built_value.dart';
 
 part 'example.g.dart';
 
+void main() {
+  // create the store
+  final store = new Store(
+    reducerBuilder.build(),
+    new Counter(),
+    new CounterActions(),
+  );
+
+  runApp(new ConnectionExample(store));
+  // or comment the line above and uncomment the line below
+  // runApp(new ConnectorExample(store));
+}
+
 /// an example using `StoreConnection`
 class ConnectionExample extends StatelessWidget {
   final Store<Counter, CounterBuilder, CounterActions> store;
@@ -61,9 +74,7 @@ class CounterWidget extends StoreConnector<Counter, CounterActions, int> {
   CounterWidget();
 
   @override
-  int connect(Counter state) {
-    return state.count;
-  }
+  int connect(Counter state) => state.count;
 
   @override
   Widget build(BuildContext context, int count, CounterActions actions) =>
@@ -80,13 +91,7 @@ class CounterWidget extends StoreConnector<Counter, CounterActions, int> {
       );
 }
 
-// Built redux counter store, actions, and reducer
-
-Store<Counter, CounterBuilder, CounterActions> createStore() => new Store(
-      reducerBuilder.build(),
-      new Counter(),
-      new CounterActions(),
-    );
+// Built redux counter state, actions, and reducer
 
 ReducerBuilder<Counter, CounterBuilder> reducerBuilder =
     new ReducerBuilder<Counter, CounterBuilder>()
