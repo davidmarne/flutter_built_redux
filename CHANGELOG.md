@@ -1,3 +1,8 @@
+## 0.4.4
+
+* add StoreConnection, which is an implementation of store connector that takes a connect & builder function as parameters.
+* add example file.
+
 ## 0.4.3
 
 * Move built_value dependency to dev_dependencies and bump to ^5.0.0
