@@ -4,6 +4,14 @@ import 'package:meta/meta.dart';
 import 'package:flutter/widgets.dart' hide Builder;
 import 'package:built_redux/built_redux.dart';
 
+/// [Connect] maps state from the store to the local state that a give
+/// component cares about
+typedef LocalState Connect<StoreState, LocalState>(StoreState state);
+
+/// [WidgetBuilder] returns a widget given context, local state, and actions
+typedef Widget WidgetBuilder<LocalState, Actions extends ReduxActions>(
+    BuildContext context, LocalState state, Actions actions);
+
 /// [StoreConnection] is a widget that rebuilds when the redux store
 /// has triggered and the connect function yields a new result. It is an implementation
 /// of `StoreConnector` that takes a connect function and builder function as parameters
@@ -24,9 +32,8 @@ import 'package:built_redux/built_redux.dart';
 /// [LocalState] should be comparable. It is recommended to only use primitive or built types.
 class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
     extends StoreConnector<StoreState, Actions, LocalState> {
-  final LocalState Function(StoreState state) _connect;
-  final Widget Function(BuildContext context, LocalState state, Actions actions)
-      _builder;
+  final Connect<StoreState, LocalState> _connect;
+  final WidgetBuilder<LocalState, Actions> _builder;
 
   StoreConnection({
     @required LocalState connect(StoreState state),
