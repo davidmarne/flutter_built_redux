@@ -1,3 +1,7 @@
+## 0.4.5
+
+* create explicit typedefs for funcs passed to StoreConnection, as the new Function syntax messes up the analyzer
+
 ## 0.4.4
 
 * add StoreConnection, which is an implementation of store connector that takes a connect & builder function as parameters.
