@@ -1,3 +1,8 @@
+## 0.5.0
+
+* **Breaking changes**:
+  * Renamed the typdef WidgetBuilder to StoreConnectionBuilder to avoid possible namespacing issues.
+
 ## 0.4.5
 
 * create explicit typedefs for funcs passed to StoreConnection, as the new Function syntax messes up the analyzer

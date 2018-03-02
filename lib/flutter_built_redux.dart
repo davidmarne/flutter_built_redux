@@ -9,7 +9,7 @@ import 'package:built_redux/built_redux.dart';
 typedef LocalState Connect<StoreState, LocalState>(StoreState state);
 
 /// [WidgetBuilder] returns a widget given context, local state, and actions
-typedef Widget WidgetBuilder<LocalState, Actions extends ReduxActions>(
+typedef Widget StoreConnectionBuilder<LocalState, Actions extends ReduxActions>(
     BuildContext context, LocalState state, Actions actions);
 
 /// [StoreConnection] is a widget that rebuilds when the redux store
@@ -33,7 +33,7 @@ typedef Widget WidgetBuilder<LocalState, Actions extends ReduxActions>(
 class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
     extends StoreConnector<StoreState, Actions, LocalState> {
   final Connect<StoreState, LocalState> _connect;
-  final WidgetBuilder<LocalState, Actions> _builder;
+  final StoreConnectionBuilder<LocalState, Actions> _builder;
 
   StoreConnection({
     @required LocalState connect(StoreState state),
