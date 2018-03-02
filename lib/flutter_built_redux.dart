@@ -8,7 +8,7 @@ import 'package:built_redux/built_redux.dart';
 /// component cares about
 typedef LocalState Connect<StoreState, LocalState>(StoreState state);
 
-/// [WidgetBuilder] returns a widget given context, local state, and actions
+/// [StoreConnectionBuilder] returns a widget given context, local state, and actions
 typedef Widget StoreConnectionBuilder<LocalState, Actions extends ReduxActions>(
     BuildContext context, LocalState state, Actions actions);
 
