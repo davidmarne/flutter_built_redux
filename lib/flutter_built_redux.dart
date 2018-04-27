@@ -34,17 +34,20 @@ class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
     extends StoreConnector<StoreState, Actions, LocalState> {
   final Connect<StoreState, LocalState> _connect;
   final StoreConnectionBuilder<LocalState, Actions> _builder;
+  final Function(BuildContext context, Store store) _init;
 
   StoreConnection({
     @required LocalState connect(StoreState state),
     @required
         Widget builder(BuildContext context, LocalState state, Actions actions),
+    void init(BuildContext context, Store store),
     Key key,
   })
       : assert(connect != null, 'StoreConnection: connect must not be null'),
         assert(builder != null, 'StoreConnection: builder must not be null'),
         _connect = connect,
         _builder = builder,
+        _init = init,
         super(key: key);
 
   @protected
@@ -53,6 +56,9 @@ class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
   @protected
   Widget build(BuildContext context, LocalState state, Actions actions) =>
       _builder(context, state, actions);
+
+  @protected
+  void init(BuildContext context, Store store) => _init(context, store);
 }
 
 /// [StoreConnector] is a widget that rebuilds when the redux store
@@ -79,6 +85,9 @@ abstract class StoreConnector<StoreState, Actions extends ReduxActions,
 
   @protected
   Widget build(BuildContext context, LocalState state, Actions actions);
+
+  @protected
+  void init(BuildContext context, Store store) {}
 }
 
 class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
@@ -123,6 +132,9 @@ class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
 
     // set the initial state
     _state = widget.connect(_store.state as StoreState);
+
+    // calls init so the user can bind his listeners
+    widget.init(context, _store);
 
     // listen to changes
     _storeSub = _store
