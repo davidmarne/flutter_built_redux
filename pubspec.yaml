@@ -5,14 +5,16 @@ version: 0.5.0
 description: Built_redux provider for Flutter
 homepage: https://github.com/davidmarne/flutter_built_redux
 dependencies:
+  # built_redux:
+  #   git: https://github.com/ga6559/built_redux
   built_redux:
-    git: https://github.com/ga6559/built_redux
+    path: ../built_redux
   flutter:
     sdk: flutter
   meta: ^1.0.3
 
 dev_dependencies:
-  build_runner: ^0.6.0  
+  build_runner: ^0.8.0
   built_value: ^5.0.0
   built_value_generator: ^5.0.0
   flutter_test:

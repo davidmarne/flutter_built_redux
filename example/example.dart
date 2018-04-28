@@ -70,7 +70,8 @@ class ConnectorExample extends StatelessWidget {
 }
 
 /// [CounterWidget] impelments [StoreConnector] manually
-class CounterWidget extends StoreConnector<Counter, CounterActions, int> {
+class CounterWidget
+    extends StoreConnector<Counter, CounterBuilder, CounterActions, int> {
   CounterWidget();
 
   @override
