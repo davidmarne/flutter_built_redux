@@ -10,15 +10,15 @@ You can override the `init` function to bind listeners you may need.
 
 Example Code:
 ```dart
-/// Displays the App.
-class AppScreen extends StoreConnector<App, AppActions, App> {
+/// Note that you must add AppBuilder too.
+class AppScreen extends StoreConnector<App, AppBuilder, AppActions, App> {
   /// Connects the state we need in this screen.
   @override
   App connect(App state) => state;
 
   /// Initializes necessary listeners for this screen.
   @override
-  void init(BuildContext context, Store store) {
+  void init(BuildContext context, Store<App, AppBuilder, AppActions> store) {
     // You can use the store to bind listeners and context to interact with the widget.
     store.stream.listen((change) {});
   }
