@@ -35,5 +35,5 @@ class AppScreen extends StoreConnector<App, AppActions, App> {
 }
 ```
 
-### Notes
-I'm maintaing this repository for personal usage. It can be removed at any time.
+## Notes
+I'm maintaining this repository for personal use. When and if those changes are merged in the default repository, I will remove this repository. If you want to use it for production, I recommend you to fork it.
