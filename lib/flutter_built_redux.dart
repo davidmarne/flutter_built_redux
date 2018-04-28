@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 import 'package:flutter/widgets.dart' hide Builder;
 import 'package:built_redux/built_redux.dart';
+import 'package:built_value/built_value.dart';
 
 /// [Connect] maps state from the store to the local state that a give
 /// component cares about
@@ -30,21 +31,27 @@ typedef Widget StoreConnectionBuilder<LocalState, Actions extends ReduxActions>(
 /// [Actions] is the generic tyoe of your built_redux store's actions contiainer
 /// [LocalState] is the state from your store that this widget needs to render.
 /// [LocalState] should be comparable. It is recommended to only use primitive or built types.
-class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
-    extends StoreConnector<StoreState, Actions, LocalState> {
+class StoreConnection<
+        StoreState extends Built<StoreState, StoreStateBuilder>,
+        StoreStateBuilder extends Builder<StoreState, StoreStateBuilder>,
+        Actions extends ReduxActions,
+        LocalState>
+    extends StoreConnector<StoreState, StoreStateBuilder, Actions, LocalState> {
   final Connect<StoreState, LocalState> _connect;
   final StoreConnectionBuilder<LocalState, Actions> _builder;
+  final Function(BuildContext context, Store store) _init;
 
   StoreConnection({
     @required LocalState connect(StoreState state),
     @required
         Widget builder(BuildContext context, LocalState state, Actions actions),
+    void init(BuildContext context, Store store),
     Key key,
-  })
-      : assert(connect != null, 'StoreConnection: connect must not be null'),
+  })  : assert(connect != null, 'StoreConnection: connect must not be null'),
         assert(builder != null, 'StoreConnection: builder must not be null'),
         _connect = connect,
         _builder = builder,
+        _init = init,
         super(key: key);
 
   @protected
@@ -53,6 +60,12 @@ class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
   @protected
   Widget build(BuildContext context, LocalState state, Actions actions) =>
       _builder(context, state, actions);
+
+  @override
+  void init(BuildContext context,
+      Store<StoreState, StoreStateBuilder, Actions> store) {
+    _init(context, store);
+  }
 }
 
 /// [StoreConnector] is a widget that rebuilds when the redux store
@@ -61,7 +74,10 @@ class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
 /// [Actions] is the generic tyoe of your built_redux store's actions contiainer
 /// [LocalState] is the state from your store that this widget needs to render.
 /// [LocalState] should be comparable. It is recommended to only use primitive or built types.
-abstract class StoreConnector<StoreState, Actions extends ReduxActions,
+abstract class StoreConnector<
+    StoreState extends Built<StoreState, StoreStateBuilder>,
+    StoreStateBuilder extends Builder<StoreState, StoreStateBuilder>,
+    Actions extends ReduxActions,
     LocalState> extends StatefulWidget {
   StoreConnector({Key key}) : super(key: key);
 
@@ -74,22 +90,32 @@ abstract class StoreConnector<StoreState, Actions extends ReduxActions,
   LocalState connect(StoreState state);
 
   @override
-  _StoreConnectorState<StoreState, Actions, LocalState> createState() =>
-      new _StoreConnectorState<StoreState, Actions, LocalState>();
+  _StoreConnectorState<StoreState, StoreStateBuilder, Actions, LocalState>
+      createState() => new _StoreConnectorState<StoreState, StoreStateBuilder,
+          Actions, LocalState>();
 
   @protected
   Widget build(BuildContext context, LocalState state, Actions actions);
+
+  @protected
+  void init(BuildContext context,
+      Store<StoreState, StoreStateBuilder, Actions> store) {}
 }
 
-class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
-    extends State<StoreConnector<StoreState, Actions, LocalState>> {
+class _StoreConnectorState<
+        StoreState extends Built<StoreState, StoreStateBuilder>,
+        StoreStateBuilder extends Builder<StoreState, StoreStateBuilder>,
+        Actions extends ReduxActions,
+        LocalState>
+    extends State<
+        StoreConnector<StoreState, StoreStateBuilder, Actions, LocalState>> {
   StreamSubscription<SubstateChange<LocalState>> _storeSub;
 
   /// [LocalState] is an object that contains the subset of the redux state tree that this component
   /// cares about.
   LocalState _state;
 
-  Store get _store {
+  Store<StoreState, StoreStateBuilder, Actions> get _store {
     // get the store from the ReduxProvider ancestor
     final ReduxProvider reduxProvider =
         context.inheritFromWidgetOfExactType(ReduxProvider);
@@ -104,7 +130,7 @@ class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
     assert(reduxProvider.store.actions is Actions,
         'Store found was not the correct type, make sure StoreConnector\'s generic for Actions matches the actions type of your built_redux store.');
 
-    return reduxProvider.store;
+    return reduxProvider.store as Store<StoreState, StoreStateBuilder, Actions>;
   }
 
   /// sets up a subscription to the store
@@ -123,6 +149,9 @@ class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
 
     // set the initial state
     _state = widget.connect(_store.state as StoreState);
+
+    // calls init so the user can bind his listeners
+    widget.init(context, _store);
 
     // listen to changes
     _storeSub = _store
