@@ -1,3 +1,7 @@
+## 0.6.0
+* Migrate to Dart 2
+* Bump dependencies to more recent versions
+
 ## 0.5.0
 
 * **Breaking changes**:
