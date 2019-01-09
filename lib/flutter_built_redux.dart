@@ -12,6 +12,12 @@ typedef LocalState Connect<StoreState, LocalState>(StoreState state);
 typedef Widget StoreConnectionBuilder<LocalState, Actions extends ReduxActions>(
     BuildContext context, LocalState state, Actions actions);
 
+/// [OnDidChange] is called on state change, after the build method
+///
+/// This can be useful for running animations after build is complete, for
+/// example scrolling to the end of a list when a new item is added.
+typedef void OnDidChange<LocalState>(LocalState state);
+
 /// [StoreConnection] is a widget that rebuilds when the redux store
 /// has triggered and the connect function yields a new result. It is an implementation
 /// of `StoreConnector` that takes a connect function and builder function as parameters
@@ -26,6 +32,10 @@ typedef Widget StoreConnectionBuilder<LocalState, Actions extends ReduxActions>(
 /// [builder] is a function that takes a `BuildContext`, the `LocalState` returned from
 /// connect, and your `ReduxActions` class and returns a widget.
 ///
+/// [onDidChange] is called on state change, after the build method.
+/// This can be useful for running animations after build is complete, for
+/// example scrolling to the end of a list when a new item is added.
+///
 /// [StoreState] is the generic type of your built_redux store's state object
 /// [Actions] is the generic tyoe of your built_redux store's actions contiainer
 /// [LocalState] is the state from your store that this widget needs to render.
@@ -34,17 +44,20 @@ class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
     extends StoreConnector<StoreState, Actions, LocalState> {
   final Connect<StoreState, LocalState> _connect;
   final StoreConnectionBuilder<LocalState, Actions> _builder;
+  final OnDidChange<LocalState> _onDidChange;
 
   StoreConnection({
     @required LocalState connect(StoreState state),
     @required
         Widget builder(BuildContext context, LocalState state, Actions actions),
     Key key,
+    onDidChange(LocalState state),
   })
       : assert(connect != null, 'StoreConnection: connect must not be null'),
         assert(builder != null, 'StoreConnection: builder must not be null'),
         _connect = connect,
         _builder = builder,
+        _onDidChange = onDidChange,
         super(key: key);
 
   @protected
@@ -53,6 +66,14 @@ class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
   @protected
   Widget build(BuildContext context, LocalState state, Actions actions) =>
       _builder(context, state, actions);
+
+  @protected
+  @override
+  onDidChange(LocalState state) {
+    if (_onDidChange != null) {
+      _onDidChange(state);
+    }
+  }
 }
 
 /// [StoreConnector] is a widget that rebuilds when the redux store
@@ -79,6 +100,11 @@ abstract class StoreConnector<StoreState, Actions extends ReduxActions,
 
   @protected
   Widget build(BuildContext context, LocalState state, Actions actions);
+
+  @protected
+  onDidChange(LocalState state) {
+    // Default implementation as this method is optional
+  }
 }
 
 class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
@@ -128,8 +154,13 @@ class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
     _storeSub = _store
         .substateStream((state) => widget.connect(state as StoreState))
         .listen((change) {
+      final newState = change.next;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onDidChange(newState);
+      });
+
       setState(() {
-        _state = change.next;
+        _state = newState;
       });
     });
   }
