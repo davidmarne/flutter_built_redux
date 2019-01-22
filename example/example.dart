@@ -33,6 +33,10 @@ class ConnectionExample extends StatelessWidget {
           store: store,
           child: new StoreConnection<Counter, CounterActions, int>(
             connect: (state) => state.count,
+            onInit: (state, actions) => print('onInit'),
+            onDidChange: (state, action) => print('onDidChange'),
+            onAfterFirstBuild: (state, action) => print('onAfterFirstBuild'),
+            onDispose: (action) => print('onDispose'),
             builder: (BuildContext context, int count, CounterActions actions) {
               return new Scaffold(
                 body: new Row(
@@ -72,6 +76,26 @@ class ConnectorExample extends StatelessWidget {
 /// [CounterWidget] impelments [StoreConnector] manually
 class CounterWidget extends StoreConnector<Counter, CounterActions, int> {
   CounterWidget();
+
+  @override
+  void onInit(int state, CounterActions actions) {
+    print('onInit');
+  }
+
+  @override
+  void onDidChange(int state, CounterActions actions) {
+    print('onDidChange');
+  }
+
+  @override
+  void onFirstBuild(int state, CounterActions actions) {
+    print('onFirstBuild');
+  }
+
+  @override
+  void onDispose(CounterActions actions) {
+    print('onDispose');
+  }
 
   @override
   int connect(Counter state) => state.count;
