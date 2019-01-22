@@ -12,6 +12,39 @@ typedef LocalState Connect<StoreState, LocalState>(StoreState state);
 typedef Widget StoreConnectionBuilder<LocalState, Actions extends ReduxActions>(
     BuildContext context, LocalState state, Actions actions);
 
+/// Called once right before building the widget.
+/// Your state will be the result of [StoreConnector.connect].
+/// You can safely use context in this callback.
+/// Perfect to fetch data/dispatch action.
+typedef OnInitCallback<LocalState, Actions extends ReduxActions> = void
+    Function(
+  LocalState state,
+  Actions actions,
+);
+
+/// Will be called after your Widget has been built for the first time.
+/// Your state will be the result of [StoreConnector.connect].
+/// This callback is useful for certain animations, showing dialogs or snackbars
+/// after your layout has been built
+typedef OnAfterFirstBuildCallback<LocalState, Actions extends ReduxActions>
+    = void Function(
+  LocalState state,
+  Actions actions,
+);
+
+/// Will be called every time the state has been changed and the widget has been rebuilt.
+typedef OnDidChangeCallback<LocalState, Actions extends ReduxActions> = void
+    Function(
+  LocalState state,
+  Actions actions,
+);
+
+/// Clean up some data or dispatch an action.
+/// This is called in [State.dispose] before the widget is removed from the
+/// Widget tree
+typedef OnDisposeCallback<Actions extends ReduxActions> = void Function(
+    Actions actions);
+
 /// [StoreConnection] is a widget that rebuilds when the redux store
 /// has triggered and the connect function yields a new result. It is an implementation
 /// of `StoreConnector` that takes a connect function and builder function as parameters
@@ -34,18 +67,61 @@ class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
     extends StoreConnector<StoreState, Actions, LocalState> {
   final Connect<StoreState, LocalState> _connect;
   final StoreConnectionBuilder<LocalState, Actions> _builder;
+  final OnInitCallback<LocalState, Actions> _onInit;
+  final OnDisposeCallback<Actions> _onDispose;
+  final OnAfterFirstBuildCallback<LocalState, Actions> _onAfterFirstBuild;
+  final OnDidChangeCallback<LocalState, Actions> _onDidChange;
 
   StoreConnection({
     @required LocalState connect(StoreState state),
     @required
         Widget builder(BuildContext context, LocalState state, Actions actions),
+    OnInitCallback<LocalState, Actions> onInit,
+    OnDisposeCallback<Actions> onDispose,
+    OnAfterFirstBuildCallback<LocalState, Actions> onAfterFirstBuild,
+    OnDidChangeCallback<LocalState, Actions> onDidChange,
     Key key,
-  })
-      : assert(connect != null, 'StoreConnection: connect must not be null'),
+  })  : assert(connect != null, 'StoreConnection: connect must not be null'),
         assert(builder != null, 'StoreConnection: builder must not be null'),
         _connect = connect,
         _builder = builder,
+        _onInit = onInit,
+        _onDispose = onDispose,
+        _onAfterFirstBuild = onAfterFirstBuild,
+        _onDidChange = onDidChange,
         super(key: key);
+
+  @protected
+  @override
+  void onInit(LocalState state, Actions actions) {
+    if (null != _onInit) {
+      _onInit(state, actions);
+    }
+  }
+
+  @protected
+  @override
+  void onDispose(Actions actions) {
+    if (null != _onDispose) {
+      _onDispose(actions);
+    }
+  }
+
+  @protected
+  @override
+  void onAfterFirstBuild(LocalState state, Actions actions) {
+    if (null != _onAfterFirstBuild) {
+      _onAfterFirstBuild(state, actions);
+    }
+  }
+
+  @protected
+  @override
+  void onDidChange(LocalState state, Actions actions) {
+    if (null != _onDidChange) {
+      _onDidChange(state, actions);
+    }
+  }
 
   @protected
   LocalState connect(StoreState state) => _connect(state);
@@ -64,6 +140,18 @@ class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
 abstract class StoreConnector<StoreState, Actions extends ReduxActions,
     LocalState> extends StatefulWidget {
   StoreConnector({Key key}) : super(key: key);
+
+  @protected
+  void onInit(LocalState state, Actions actions) {}
+
+  @protected
+  void onDispose(Actions actions) {}
+
+  @protected
+  void onAfterFirstBuild(LocalState state, Actions actions) {}
+
+  @protected
+  void onDidChange(LocalState state, Actions actions) {}
 
   /// [connect] takes the current state of the redux store and retuns an object that contains
   /// the subset of the redux state tree that this component cares about.
@@ -89,23 +177,7 @@ class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
   /// cares about.
   LocalState _state;
 
-  Store get _store {
-    // get the store from the ReduxProvider ancestor
-    final ReduxProvider reduxProvider =
-        context.inheritFromWidgetOfExactType(ReduxProvider);
-
-    // if it is not found raise an error
-    assert(reduxProvider != null,
-        'Store was not found, make sure ReduxProvider is an ancestor of this component.');
-
-    assert(reduxProvider.store.state is StoreState,
-        'Store found was not the correct type, make sure StoreConnector\'s generic for StoreState matches the state type of your built_redux store.');
-
-    assert(reduxProvider.store.actions is Actions,
-        'Store found was not the correct type, make sure StoreConnector\'s generic for Actions matches the actions type of your built_redux store.');
-
-    return reduxProvider.store;
-  }
+  Store _store;
 
   /// sets up a subscription to the store
   @override
@@ -121,8 +193,30 @@ class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
     // See https://github.com/flutter/flutter/blob/0.0.20/packages/flutter/lib/src/widgets/framework.dart#L3721
     if (_storeSub != null) return;
 
+    // get the store from the ReduxProvider ancestor
+    final ReduxProvider reduxProvider =
+        context.inheritFromWidgetOfExactType(ReduxProvider);
+
+    // if it is not found raise an error
+    assert(reduxProvider != null,
+        'Store was not found, make sure ReduxProvider is an ancestor of this component.');
+
+    assert(reduxProvider.store.state is StoreState,
+        'Store found was not the correct type, make sure StoreConnector\'s generic for StoreState matches the state type of your built_redux store.');
+
+    assert(reduxProvider.store.actions is Actions,
+        'Store found was not the correct type, make sure StoreConnector\'s generic for Actions matches the actions type of your built_redux store.');
+
+    _store = reduxProvider.store;
+
     // set the initial state
     _state = widget.connect(_store.state as StoreState);
+
+    widget.onInit(_state, _store.actions as Actions);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onAfterFirstBuild(_state, _store.actions as Actions);
+    });
 
     // listen to changes
     _storeSub = _store
@@ -130,6 +224,10 @@ class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
         .listen((change) {
       setState(() {
         _state = change.next;
+      });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onDidChange(_state, _store.actions as Actions);
       });
     });
   }
@@ -139,6 +237,7 @@ class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
   @mustCallSuper
   void dispose() {
     _storeSub.cancel();
+    widget.onDispose(_store.actions as Actions);
     super.dispose();
   }
 
