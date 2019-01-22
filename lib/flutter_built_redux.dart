@@ -26,8 +26,8 @@ typedef OnInitCallback<LocalState, Actions extends ReduxActions> = void
 /// Your state will be the result of [StoreConnector.connect].
 /// This callback is useful for certain animations, showing dialogs or snackbars
 /// after your layout has been built
-typedef OnAfterFirstBuildCallback<LocalState, Actions extends ReduxActions>
-    = void Function(
+typedef OnFirstBuildCallback<LocalState, Actions extends ReduxActions> = void
+    Function(
   LocalState state,
   Actions actions,
 );
@@ -69,7 +69,7 @@ class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
   final StoreConnectionBuilder<LocalState, Actions> _builder;
   final OnInitCallback<LocalState, Actions> _onInit;
   final OnDisposeCallback<Actions> _onDispose;
-  final OnAfterFirstBuildCallback<LocalState, Actions> _onAfterFirstBuild;
+  final OnFirstBuildCallback<LocalState, Actions> _onFirstBuild;
   final OnDidChangeCallback<LocalState, Actions> _onDidChange;
 
   StoreConnection({
@@ -78,7 +78,7 @@ class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
         Widget builder(BuildContext context, LocalState state, Actions actions),
     OnInitCallback<LocalState, Actions> onInit,
     OnDisposeCallback<Actions> onDispose,
-    OnAfterFirstBuildCallback<LocalState, Actions> onAfterFirstBuild,
+    OnFirstBuildCallback<LocalState, Actions> onAfterFirstBuild,
     OnDidChangeCallback<LocalState, Actions> onDidChange,
     Key key,
   })  : assert(connect != null, 'StoreConnection: connect must not be null'),
@@ -87,7 +87,7 @@ class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
         _builder = builder,
         _onInit = onInit,
         _onDispose = onDispose,
-        _onAfterFirstBuild = onAfterFirstBuild,
+        _onFirstBuild = onAfterFirstBuild,
         _onDidChange = onDidChange,
         super(key: key);
 
@@ -109,9 +109,9 @@ class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
 
   @protected
   @override
-  void onAfterFirstBuild(LocalState state, Actions actions) {
-    if (null != _onAfterFirstBuild) {
-      _onAfterFirstBuild(state, actions);
+  void onFirstBuild(LocalState state, Actions actions) {
+    if (null != _onFirstBuild) {
+      _onFirstBuild(state, actions);
     }
   }
 
@@ -148,7 +148,7 @@ abstract class StoreConnector<StoreState, Actions extends ReduxActions,
   void onDispose(Actions actions) {}
 
   @protected
-  void onAfterFirstBuild(LocalState state, Actions actions) {}
+  void onFirstBuild(LocalState state, Actions actions) {}
 
   @protected
   void onDidChange(LocalState state, Actions actions) {}
@@ -215,7 +215,7 @@ class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
     widget.onInit(_state, _store.actions as Actions);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.onAfterFirstBuild(_state, _store.actions as Actions);
+      widget.onFirstBuild(_state, _store.actions as Actions);
     });
 
     // listen to changes

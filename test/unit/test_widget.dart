@@ -114,7 +114,7 @@ class ProviderCallbackWidgetConnection extends StatelessWidget {
   final Store<Counter, CounterBuilder, CounterActions> store;
   int onInitCount = 0;
   int onDisposeCount = 0;
-  int onAfterFirstBuildCount = 0;
+  int onFirstBuildCount = 0;
   int onDidChangeCount = 0;
   int onDidChangeState;
 
@@ -134,7 +134,7 @@ class ProviderCallbackWidgetConnection extends StatelessWidget {
               onDisposeCount++;
             },
             onAfterFirstBuild: (state, actions) {
-              onAfterFirstBuildCount++;
+              onFirstBuildCount++;
             },
             onDidChange: (state, actions) {
               onDidChangeState = state;
@@ -189,7 +189,7 @@ class ProviderCallbackWidgetConnector extends StatelessWidget {
 class CounterCallbackWidget extends CounterWidget {
   int onInitCount = 0;
   int onDisposeCount = 0;
-  int onAfterFirstBuildCount = 0;
+  int onFirstBuildCount = 0;
   int onDidChangeCount = 0;
   int onDidChangeState;
 
@@ -206,8 +206,8 @@ class CounterCallbackWidget extends CounterWidget {
   }
 
   @override
-  void onAfterFirstBuild(int state, CounterActions actions) {
-    onAfterFirstBuildCount++;
+  void onFirstBuild(int state, CounterActions actions) {
+    onFirstBuildCount++;
   }
 
   @override

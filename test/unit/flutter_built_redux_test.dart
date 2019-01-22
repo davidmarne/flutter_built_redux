@@ -149,7 +149,7 @@ void main() {
         expect(counterWidget2.onDisposeCount, 0);
       });
 
-      testWidgets('triggers onAfterFirstBuild', (WidgetTester tester) async {
+      testWidgets('triggers onFirstBuild', (WidgetTester tester) async {
         final firstState = store.state;
         final providerWidget = new ProviderCallbackWidgetConnector(store);
 
@@ -159,18 +159,18 @@ void main() {
           find.byKey(counterKey),
         );
 
-        expect(counterWidget.onAfterFirstBuildCount, 1);
+        expect(counterWidget.onFirstBuildCount, 1);
         expect(firstState, store.state);
 
         await tester.tap(find.byKey(incrementButtonKey));
         await tester.pump();
 
-        expect(counterWidget.onAfterFirstBuildCount, 1);
+        expect(counterWidget.onFirstBuildCount, 1);
 
         await tester.pumpWidget(providerWidget);
         await tester.tap(find.byKey(incrementButtonKey));
 
-        expect(counterWidget.onAfterFirstBuildCount, 1);
+        expect(counterWidget.onFirstBuildCount, 1);
       });
 
       testWidgets('triggers onDidChange', (WidgetTester tester) async {
@@ -301,24 +301,24 @@ void main() {
         expect(providerWidget.onDisposeCount, 1);
       });
 
-      testWidgets('triggers onAfterFirstBuild', (WidgetTester tester) async {
+      testWidgets('triggers onFirstBuild', (WidgetTester tester) async {
         final firstState = store.state;
         final providerWidget = new ProviderCallbackWidgetConnection(store);
-        expect(providerWidget.onAfterFirstBuildCount, 0);
+        expect(providerWidget.onFirstBuildCount, 0);
         await tester.pumpWidget(providerWidget);
 
-        expect(providerWidget.onAfterFirstBuildCount, 1);
+        expect(providerWidget.onFirstBuildCount, 1);
         expect(firstState, store.state);
 
         await tester.tap(find.byKey(incrementButtonKey));
         await tester.pump();
 
-        expect(providerWidget.onAfterFirstBuildCount, 1);
+        expect(providerWidget.onFirstBuildCount, 1);
 
         await tester.pumpWidget(providerWidget);
         await tester.tap(find.byKey(incrementButtonKey));
 
-        expect(providerWidget.onAfterFirstBuildCount, 1);
+        expect(providerWidget.onFirstBuildCount, 1);
       });
 
       testWidgets('triggers onDidChange', (WidgetTester tester) async {
