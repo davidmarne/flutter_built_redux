@@ -145,6 +145,18 @@ class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
   @override
   Widget build(BuildContext context) =>
       widget.build(context, _state, _store.actions as Actions);
+
+  @mustCallSuper
+  @protected
+  void didUpdateWidget(StoreConnector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final newState = widget.connect(_store.state as StoreState);
+    if (_state != newState) {
+      setState(() {
+        _state = newState;
+      });
+    }
+  }
 }
 
 /// [ReduxProvider] provides access to the redux store to descendant widgets.
