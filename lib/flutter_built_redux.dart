@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:meta/meta.dart';
-import 'package:flutter/widgets.dart' hide Builder;
 import 'package:built_redux/built_redux.dart';
+import 'package:flutter/widgets.dart' hide Builder;
+import 'package:meta/meta.dart';
 
 /// [Connect] maps state from the store to the local state that a give
 /// component cares about
@@ -40,8 +40,7 @@ class StoreConnection<StoreState, Actions extends ReduxActions, LocalState>
     @required
         Widget builder(BuildContext context, LocalState state, Actions actions),
     Key key,
-  })
-      : assert(connect != null, 'StoreConnection: connect must not be null'),
+  })  : assert(connect != null, 'StoreConnection: connect must not be null'),
         assert(builder != null, 'StoreConnection: builder must not be null'),
         _connect = connect,
         _builder = builder,
@@ -92,7 +91,7 @@ class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
   Store get _store {
     // get the store from the ReduxProvider ancestor
     final ReduxProvider reduxProvider =
-        context.inheritFromWidgetOfExactType(ReduxProvider);
+        context.dependOnInheritedWidgetOfExactType<ReduxProvider>();
 
     // if it is not found raise an error
     assert(reduxProvider != null,
