@@ -145,7 +145,7 @@ class _StoreConnectorState<StoreState, Actions extends ReduxActions, LocalState>
 }
 
 /// [ReduxProvider] provides access to the redux store to descendant widgets.
-/// [ReduxProvider] must be an ancesestor of a `StoreConnector`, otherwise the
+/// [ReduxProvider] must be an ancestor of a `StoreConnector`, otherwise the
 /// `StoreConnector` will throw during initialization.
 class ReduxProvider extends InheritedWidget {
   ReduxProvider({Key? key, required this.store, required Widget child})
