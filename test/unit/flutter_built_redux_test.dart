@@ -6,21 +6,21 @@ import 'test_models.dart';
 import 'test_widget.dart';
 
 void main() {
-  Store<Counter, CounterBuilder, CounterActions> store;
+  Store<Counter, CounterBuilder, CounterActions>? store;
 
   setUp(() {
     store = createStore();
   });
 
   tearDown(() async {
-    await store.dispose();
+    await store!.dispose();
   });
 
   group('flutter_built_redux: ', () {
     group('StoreConnector: ', () {
       testWidgets('renders default state correctly',
           (WidgetTester tester) async {
-        final providerWidget = new ProviderWidgetConnector(store);
+        final providerWidget = ProviderWidgetConnector(store);
 
         await tester.pumpWidget(providerWidget);
 
@@ -37,7 +37,7 @@ void main() {
       });
 
       testWidgets('rerenders after increment', (WidgetTester tester) async {
-        final widget = new ProviderWidgetConnector(store);
+        final widget = ProviderWidgetConnector(store);
 
         await tester.pumpWidget(widget);
 
@@ -69,7 +69,7 @@ void main() {
 
       testWidgets('does not rerender after update to other counter',
           (WidgetTester tester) async {
-        final widget = new ProviderWidgetConnector(store);
+        final widget = ProviderWidgetConnector(store);
 
         await tester.pumpWidget(widget);
 
@@ -104,7 +104,7 @@ void main() {
     group('StoreConnection: ', () {
       testWidgets('renders default state correctly',
           (WidgetTester tester) async {
-        final providerWidget = new ProviderWidgetConnection(store);
+        final providerWidget = ProviderWidgetConnection(store);
 
         await tester.pumpWidget(providerWidget);
 
@@ -117,7 +117,7 @@ void main() {
       });
 
       testWidgets('rerenders after increment', (WidgetTester tester) async {
-        final providerWidget = new ProviderWidgetConnection(store);
+        final providerWidget = ProviderWidgetConnection(store);
 
         await tester.pumpWidget(providerWidget);
 
@@ -141,7 +141,7 @@ void main() {
 
       testWidgets('does not rerender after update to other counter',
           (WidgetTester tester) async {
-        final providerWidget = new ProviderWidgetConnection(store);
+        final providerWidget = ProviderWidgetConnection(store);
 
         await tester.pumpWidget(providerWidget);
 

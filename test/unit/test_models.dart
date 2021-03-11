@@ -1,24 +1,24 @@
 library test_models;
 
-import 'package:built_value/built_value.dart';
 import 'package:built_redux/built_redux.dart';
+import 'package:built_value/built_value.dart';
 
 part 'test_models.g.dart';
 
-Store<Counter, CounterBuilder, CounterActions> createStore() => new Store(
+Store<Counter, CounterBuilder, CounterActions> createStore() => Store(
       createReducer(),
-      new Counter(),
-      new CounterActions(),
+      Counter(),
+      CounterActions(),
     );
 
 Reducer<Counter, CounterBuilder, dynamic> createReducer() =>
-    (new ReducerBuilder<Counter, CounterBuilder>()
+    (ReducerBuilder<Counter, CounterBuilder>()
           ..add(CounterActionsNames.increment, (s, a, b) => b.count++)
           ..add(CounterActionsNames.incrementOther, (s, a, b) => b.other++))
         .build();
 
 abstract class CounterActions extends ReduxActions {
-  factory CounterActions() => new _$CounterActions();
+  factory CounterActions() => _$CounterActions();
   CounterActions._();
 
   ActionDispatcher<Null> get increment;
@@ -26,12 +26,12 @@ abstract class CounterActions extends ReduxActions {
 }
 
 abstract class Counter implements Built<Counter, CounterBuilder> {
-  factory Counter() => new _$Counter._(
+  factory Counter() => _$Counter._(
         count: 0,
         other: 0,
       );
   Counter._();
 
-  int get count;
-  int get other;
+  int? get count;
+  int? get other;
 }
